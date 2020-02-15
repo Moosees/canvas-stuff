@@ -10,7 +10,6 @@ const {
 
 const width = document.body.clientWidth;
 const height = document.body.clientHeight;
-console.log({ width, height });
 
 const engine = Engine.create();
 const { world } = engine;
