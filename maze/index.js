@@ -49,9 +49,6 @@ const walls = [
 ];
 World.add(world, walls);
 
-// Maze rooms
-const rooms = Array(verticalCells).fill(Array(horizontalCells).fill(true));
-
 // Vertical walls
 const showVerticalWalls = Array(verticalCells).fill(
   Array(horizontalCells - 1).fill(true)
@@ -99,3 +96,50 @@ showHorizontalWalls.forEach((row, y) => {
 });
 
 World.add(world, horizontalWalls);
+
+// Build maze
+const maze = Array(verticalCells).fill(Array(horizontalCells).fill(false));
+const startingRoom = {
+  x: Math.floor(Math.random() * horizontalCells),
+  y: Math.floor(Math.random() * verticalCells)
+};
+const path = [startingRoom];
+
+const checkRoom = (x, y, maze) => {
+  return (
+    x >= 0 && x < horizontalCells && y >= 0 && y < verticalCells && !maze[y][x]
+  );
+};
+
+const findAdjacentRooms = (x, y, maze) => {
+  let adjacentRooms = [];
+  if (checkRoom(x, y - 1, maze)) {
+    adjacentRooms.push({ x, y: y - 1 });
+  }
+  if (checkRoom(x + 1, y, maze)) {
+    adjacentRooms.push({ x: x + 1, y });
+  }
+  if (checkRoom(x, y + 1, maze)) {
+    adjacentRooms.push({ x, y: y + 1 });
+  }
+  if (checkRoom(x - 1, y, maze)) {
+    adjacentRooms.push({ x: x - 1, y });
+  }
+  return adjacentRooms;
+};
+
+const buildMaze = (maze, path) => {
+  while (path.length) {
+    const adjacentRooms = findAdjacentRooms(path[0].x, path[0].y, maze);
+    if (adjacentRooms.length) {
+      const direction = Math.floor(Math.random() * adjacentRooms.length);
+      const nextRoom = adjacentRooms[direction];
+      maze[nextRoom.y][nextRoom.x] = 'banana';
+      path.push(nextRoom);
+    } else {
+      path.pop();
+    }
+  }
+};
+
+buildMaze(maze, path);
