@@ -3,8 +3,9 @@ const { Engine, Render, Runner, World, Bodies } = Matter;
 // Grid size calculations
 const width = document.body.clientWidth;
 const height = document.body.clientHeight;
-const horizontalCells = Math.floor(width / 200);
-const verticalCells = Math.floor(height / 200);
+const horizontalCells = Math.floor(width / 125);
+const verticalCells = Math.floor(height / 125);
+const totalRooms = horizontalCells * verticalCells;
 const horizontalSpacing = width / horizontalCells;
 const verticalSpacing = height / verticalCells;
 
@@ -22,32 +23,29 @@ const render = Render.create({
   }
 });
 
-// Setup initial wall grid
-const vericalWallLayout = Array(verticalCells).fill(
+// Setup initial maze layout
+const maze = Array.from(Array(verticalCells), () =>
+  Array(horizontalCells).fill(false)
+);
+const vericalWallLayout = Array.from(Array(verticalCells), () =>
   Array(horizontalCells - 1).fill(true)
 );
-
-const horizontalWallLayout = Array(verticalCells - 1).fill(
+const horizontalWallLayout = Array.from(Array(verticalCells - 1), () =>
   Array(horizontalCells).fill(true)
 );
 
-// Setup maze for traversal
-const maze = Array(verticalCells).fill(Array(horizontalCells).fill(false));
+// Pick a starting room
 const startingRoom = {
   x: Math.floor(Math.random() * horizontalCells),
   y: Math.floor(Math.random() * verticalCells)
 };
-const path = [startingRoom];
 
 // Maze helper functions
-const checkRoom = (x, y, maze) => {
-  return (
-    x >= 0 && x < horizontalCells && y >= 0 && y < verticalCells && !maze[y][x]
-  );
-};
+const checkRoom = (x, y, maze) =>
+  x >= 0 && x < horizontalCells && y >= 0 && y < verticalCells && !maze[y][x];
 
 const findAdjacentRooms = (x, y, maze) => {
-  let adjacentRooms = [];
+  const adjacentRooms = [];
   if (checkRoom(x, y - 1, maze)) {
     adjacentRooms.push({ x, y: y - 1, direction: 'up' });
   }
@@ -63,22 +61,58 @@ const findAdjacentRooms = (x, y, maze) => {
   return adjacentRooms;
 };
 
-const buildMaze = (maze, path, verticalWalls, horizontalWalls) => {
-  while (path.length) {
-    const adjacentRooms = findAdjacentRooms(path[0].x, path[0].y, maze);
+const breakWall = (nextRoom, verticalWalls, horizontalWalls) => {
+  if (nextRoom.direction === 'up') {
+    horizontalWalls[nextRoom.y][nextRoom.x] = false;
+  }
+  if (nextRoom.direction === 'right') {
+    verticalWalls[nextRoom.y][nextRoom.x - 1] = false;
+  }
+  if (nextRoom.direction === 'down') {
+    horizontalWalls[nextRoom.y - 1][nextRoom.x] = false;
+  }
+  if (nextRoom.direction === 'left') {
+    verticalWalls[nextRoom.y][nextRoom.x] = false;
+  }
+};
+
+const buildMaze = (
+  maze,
+  startingRoom,
+  totalRooms,
+  verticalWalls,
+  horizontalWalls
+) => {
+  const path = [startingRoom];
+  let unvisitedRooms = totalRooms;
+  let currentRoom = startingRoom;
+  maze[currentRoom.y][currentRoom.x] = true;
+
+  while (path.length && unvisitedRooms) {
+    const adjacentRooms = findAdjacentRooms(currentRoom.x, currentRoom.y, maze);
+
     if (adjacentRooms.length) {
       const direction = Math.floor(Math.random() * adjacentRooms.length);
-      const nextRoom = adjacentRooms[direction];
-      maze[nextRoom.y][nextRoom.x] = true;
-      path.push(nextRoom);
+      currentRoom = adjacentRooms[direction];
+      breakWall(currentRoom, verticalWalls, horizontalWalls);
+      path.push(currentRoom);
+      maze[currentRoom.y][currentRoom.x] = true;
+      unvisitedRooms--;
     } else {
       path.pop();
+      currentRoom = path[path.length - 1];
     }
   }
 };
 
 // Generate the maze
-buildMaze(maze, path, vericalWallLayout, horizontalWallLayout);
+buildMaze(
+  maze,
+  startingRoom,
+  totalRooms,
+  vericalWallLayout,
+  horizontalWallLayout
+);
 
 // Styling for the walls
 const wallOptions = {
