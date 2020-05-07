@@ -1,4 +1,4 @@
-const { Engine, Render, Runner, World, Bodies } = Matter;
+const { Engine, Render, Runner, World, Bodies, Body } = Matter;
 
 // Grid size calculations
 const width = document.body.clientWidth;
@@ -11,6 +11,7 @@ const verticalSpacing = height / verticalCells;
 
 // matter-js setup
 const engine = Engine.create();
+engine.world.gravity.y = 0;
 const { world } = engine;
 const render = Render.create({
   element: document.body,
@@ -186,3 +187,37 @@ World.add(world, verticalWalls);
 World.add(world, horizontalWalls);
 World.add(world, goal);
 World.add(world, player);
+
+// Controls
+document.addEventListener('keydown', (e) => {
+  const { x, y } = player.velocity;
+
+  switch (e.keyCode) {
+    // Up
+    case 87:
+    case 38:
+      Body.setVelocity(player, { x, y: y - 5 });
+      break;
+
+    // Right
+    case 68:
+    case 39:
+      Body.setVelocity(player, { x: x + 5, y });
+      break;
+
+    // Down
+    case 83:
+    case 40:
+      Body.setVelocity(player, { x, y: y + 5 });
+      break;
+
+    // Left
+    case 65:
+    case 37:
+      Body.setVelocity(player, { x: x - 5, y });
+      break;
+
+    default:
+      break;
+  }
+});
