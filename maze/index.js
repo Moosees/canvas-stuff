@@ -27,7 +27,7 @@ const render = Render.create({
 const maze = Array.from(Array(verticalCells), () =>
   Array(horizontalCells).fill(false)
 );
-const vericalWallLayout = Array.from(Array(verticalCells), () =>
+const verticalWallLayout = Array.from(Array(verticalCells), () =>
   Array(horizontalCells - 1).fill(true)
 );
 const horizontalWallLayout = Array.from(Array(verticalCells - 1), () =>
@@ -110,7 +110,7 @@ buildMaze(
   maze,
   startingRoom,
   totalRooms,
-  vericalWallLayout,
+  verticalWallLayout,
   horizontalWallLayout
 );
 
@@ -132,7 +132,7 @@ const outerWalls = [
 
 // Determine what walls to render
 const verticalWalls = [];
-vericalWallLayout.forEach((row, y) => {
+verticalWallLayout.forEach((row, y) => {
   row.forEach((wall, x) => {
     if (wall)
       verticalWalls.push(
@@ -171,6 +171,13 @@ const goal = Bodies.rectangle(
   { isStatic: true, render: { fillStyle: '#5c5' } }
 );
 
+const player = Bodies.circle(
+  horizontalSpacing / 2,
+  verticalSpacing / 2,
+  Math.min(horizontalSpacing, verticalSpacing) * 0.4,
+  { render: { fillStyle: '#f0f' } }
+);
+
 // Render the maze
 Engine.run(engine);
 Render.run(render);
@@ -178,3 +185,4 @@ World.add(world, outerWalls);
 World.add(world, verticalWalls);
 World.add(world, horizontalWalls);
 World.add(world, goal);
+World.add(world, player);
