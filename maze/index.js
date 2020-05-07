@@ -19,8 +19,8 @@ const render = Render.create({
     width,
     height,
     wireframes: false,
-    background: '#999'
-  }
+    background: '#999',
+  },
 });
 
 // Setup initial maze layout
@@ -37,7 +37,7 @@ const horizontalWallLayout = Array.from(Array(verticalCells - 1), () =>
 // Pick a starting room
 const startingRoom = {
   x: Math.floor(Math.random() * horizontalCells),
-  y: Math.floor(Math.random() * verticalCells)
+  y: Math.floor(Math.random() * verticalCells),
 };
 
 // Maze helper functions
@@ -118,8 +118,8 @@ buildMaze(
 const wallOptions = {
   isStatic: true,
   render: {
-    fillStyle: '#000'
-  }
+    fillStyle: '#000',
+  },
 };
 
 // Setup outer walls
@@ -127,7 +127,7 @@ const outerWalls = [
   Bodies.rectangle(width / 2, 0, width, 10, wallOptions),
   Bodies.rectangle(width / 2, height, width, 10, wallOptions),
   Bodies.rectangle(0, height / 2, 10, height, wallOptions),
-  Bodies.rectangle(width, height / 2, 10, height, wallOptions)
+  Bodies.rectangle(width, height / 2, 10, height, wallOptions),
 ];
 
 // Determine what walls to render
@@ -163,9 +163,18 @@ horizontalWallLayout.forEach((row, y) => {
   });
 });
 
+const goal = Bodies.rectangle(
+  width - horizontalSpacing / 2,
+  height - verticalSpacing / 2,
+  horizontalSpacing * 0.9,
+  verticalSpacing * 0.9,
+  { isStatic: true, render: { fillStyle: '#5c5' } }
+);
+
 // Render the maze
 Engine.run(engine);
 Render.run(render);
 World.add(world, outerWalls);
 World.add(world, verticalWalls);
 World.add(world, horizontalWalls);
+World.add(world, goal);
