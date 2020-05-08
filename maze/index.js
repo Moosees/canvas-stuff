@@ -1,8 +1,10 @@
-const { Engine, Render, Runner, World, Bodies, Body } = Matter;
+const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 
 // Grid size calculations
 const width = document.body.clientWidth;
 const height = document.body.clientHeight;
+// const width = 400;
+// const height = 400;
 const horizontalCells = Math.floor(width / 125);
 const verticalCells = Math.floor(height / 125);
 const totalRooms = horizontalCells * verticalCells;
@@ -169,14 +171,14 @@ const goal = Bodies.rectangle(
   height - verticalSpacing / 2,
   horizontalSpacing * 0.9,
   verticalSpacing * 0.9,
-  { isStatic: true, render: { fillStyle: '#5c5' } }
+  { isStatic: true, label: 'goal', render: { fillStyle: '#5c5' } }
 );
 
 const player = Bodies.circle(
   horizontalSpacing / 2,
   verticalSpacing / 2,
-  Math.min(horizontalSpacing, verticalSpacing) * 0.4,
-  { render: { fillStyle: '#f0f' } }
+  Math.min(horizontalSpacing, verticalSpacing) * 0.3,
+  { label: 'player', render: { fillStyle: '#f0f' } }
 );
 
 // Render the maze
@@ -220,4 +222,15 @@ document.addEventListener('keydown', (e) => {
     default:
       break;
   }
+});
+
+// Game logic
+Events.on(engine, 'collisionStart', (e) => {
+  e.pairs.forEach(({ bodyA, bodyB }) => {
+    const labels = [bodyA.label, bodyB.label];
+
+    if (labels.includes('player') && labels.includes('goal')) {
+      console.log('WINWINWIWN');
+    }
+  });
 });
