@@ -22,7 +22,7 @@ const render = Render.create({
     width,
     height,
     wireframes: false,
-    background: '#999',
+    background: '#939',
   },
 });
 
@@ -117,20 +117,29 @@ buildMaze(
   horizontalWallLayout
 );
 
-// Styling for the walls
-const wallOptions = {
+// Body options
+const borderOptions = {
   isStatic: true,
+  label: 'border',
   render: {
     fillStyle: '#000',
   },
 };
 
+const wallOptions = {
+  isStatic: true,
+  label: 'wall',
+  render: {
+    fillStyle: '#333',
+  },
+};
+
 // Setup outer walls
 const outerWalls = [
-  Bodies.rectangle(width / 2, 0, width, 10, wallOptions),
-  Bodies.rectangle(width / 2, height, width, 10, wallOptions),
-  Bodies.rectangle(0, height / 2, 10, height, wallOptions),
-  Bodies.rectangle(width, height / 2, 10, height, wallOptions),
+  Bodies.rectangle(width / 2, 0, width, 10, borderOptions),
+  Bodies.rectangle(width / 2, height, width, 10, borderOptions),
+  Bodies.rectangle(0, height / 2, 10, height, borderOptions),
+  Bodies.rectangle(width, height / 2, 10, height, borderOptions),
 ];
 
 // Determine what walls to render
@@ -191,6 +200,8 @@ World.add(world, goal);
 World.add(world, player);
 
 // Controls
+let currentVelocity = 5;
+
 document.addEventListener('keydown', (e) => {
   const { x, y } = player.velocity;
 
@@ -198,25 +209,25 @@ document.addEventListener('keydown', (e) => {
     // Up
     case 87:
     case 38:
-      Body.setVelocity(player, { x, y: y - 5 });
+      Body.setVelocity(player, { x, y: y - currentVelocity });
       break;
 
     // Right
     case 68:
     case 39:
-      Body.setVelocity(player, { x: x + 5, y });
+      Body.setVelocity(player, { x: x + currentVelocity, y });
       break;
 
     // Down
     case 83:
     case 40:
-      Body.setVelocity(player, { x, y: y + 5 });
+      Body.setVelocity(player, { x, y: y + currentVelocity });
       break;
 
     // Left
     case 65:
     case 37:
-      Body.setVelocity(player, { x: x - 5, y });
+      Body.setVelocity(player, { x: x - currentVelocity, y });
       break;
 
     default:
@@ -230,7 +241,19 @@ Events.on(engine, 'collisionStart', (e) => {
     const labels = [bodyA.label, bodyB.label];
 
     if (labels.includes('player') && labels.includes('goal')) {
-      console.log('WINWINWIWN');
+      winGame();
     }
   });
 });
+
+const winGame = () => {
+  world.bodies.forEach((body) => {
+    if (body.label === 'wall') {
+      Body.setStatic(body, false);
+    }
+  });
+  currentVelocity = 10;
+  Events.off(engine, 'collisionStart');
+  Body.setVelocity(player, { x: -10, y: -10 });
+  Body.scale(player, 3, 3);
+};
