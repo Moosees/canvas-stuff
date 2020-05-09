@@ -187,7 +187,12 @@ const player = Bodies.circle(
   horizontalSpacing / 2,
   verticalSpacing / 2,
   Math.min(horizontalSpacing, verticalSpacing) * 0.3,
-  { label: 'player', render: { fillStyle: '#f0f' } }
+  {
+    label: 'player',
+    friction: 0.05,
+    frictionAir: 0.005,
+    render: { fillStyle: '#f0f' },
+  }
 );
 
 // Render the maze
@@ -252,8 +257,11 @@ const winGame = () => {
       Body.setStatic(body, false);
     }
   });
-  currentVelocity = 10;
+  currentVelocity = 20;
   Events.off(engine, 'collisionStart');
-  Body.setVelocity(player, { x: -10, y: -10 });
-  Body.scale(player, 3, 3);
+  
+  Body.setVelocity(player, { x: -20, y: -20 });
+  Body.scale(player, 2, 2);
+  Body.setMass(player, 50);
+  Body.set(player, { friction: 0.01, frictionAir: 0.001 });
 };
